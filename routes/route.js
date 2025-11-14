@@ -1,6 +1,7 @@
 import express from "express"
 import userModel from "../model/scheme.js"
 
+
 const prodRoute=express.Router()
 
 prodRoute.get("/",async(req,res)=>{
@@ -13,13 +14,17 @@ prodRoute.get("/",async(req,res)=>{
     })
     } catch (error) {
         console.error(error.message)
+        res.send({
+             message:"unsuccessful",
+            code:400,
+        })
     }
   
 })
 prodRoute.post("/",async(req,res)=>{
     try {
-            const{name,price}=req.body
-            if(!name || !price){
+            const{name,price,desc,category,rating,inStock}=req.body
+            if(!name || !price || !desc || !category || !rating ||!inStock){
                 return res.json("Invalid data for creating user")
             }
     const newProduct=new userModel(req.body)
@@ -31,37 +36,42 @@ prodRoute.post("/",async(req,res)=>{
         code:200,
     })
     }
-    else{
-        res.json({
-                 message:"unsuccessful",
-                 code:200,
-        })
-    }
+    // else{
+    //     res.json({
+    //              message:"unsuccessful",
+    //              code:400,
+    //     })
+    // }
 }
     catch (error) {
         console.error(error.message)
-    }
-})
-prodRoute.get("/:id",async(req,res)=>{
-    try {
-         const {id}=req.params
-    let oneProduct=await userModel.findById(id)
-    if(oneProduct){
-       return res.json({
-            message:"successful",
-            product:oneProduct,
+          res.json({
+                 message:"unsuccessful",
+                 code:400,
         })
     }
-    else{
-     return res.json("No user exists with the given id")
-    }
+}
+)
+// prodRoute.get("/:id",async(req,res)=>{
+//     try {
+//          const {id}=req.params
+//     let oneProduct=await userModel.findById(id)
+//     if(oneProduct){
+//        return res.json({
+//             message:"successful",
+//             product:oneProduct,
+//         })
+//     }
+//     else{
+//      return res.json("No user exists with the given id")
+//     }
 
-    } catch (error) {
-        console.error(error.message)
-        res.json("Error!")
-    }
+//     } catch (error) {
+//         console.error(error.message)
+//         res.json("Error!")
+//     }
    
-})
+// })
 prodRoute.delete("/:id",async(req,res)=>{
     try {
            const {id}=req.params
@@ -77,9 +87,27 @@ prodRoute.delete("/:id",async(req,res)=>{
  
     } catch (error) {
         console.error(error)
-        res.json("User doesn't exists.")
+        res.json({
+        message:"User doesn't exists!",
+        code:400
+    })
     }
  
+})
+prodRoute.get("/filter",async(req,res)=>{
+    try {
+        let queries=req.query
+        console.log(queries)
+       
+        let smit=await userModel.find(
+            // {name:{$regex:req.query.name,$options:"i"}}
+            // {inStock:req.query.inStock}
+            {price:req.query.price}
+        )
+        res.send(smit)
+    } catch (error) {
+        console.error(error.message)
+    }
 })
 
 export default prodRoute

@@ -1,16 +1,18 @@
 import express from "express"
 import prodRoute from "./routes/route.js"
 import mongoose from "mongoose"
+import dotenv from "dotenv"
 const app = express()
 const port = 3000
 
+dotenv.config()
 app.use(express.json());
 
 let middleware=(req,res,next)=>{
     console.log("Middleware Running")
     next()
 }
-const db_url="mongodb+srv://Talha:mongodb123@cluster0.6slhxve.mongodb.net/SMIT"
+const db_url=process.env.db_url
 mongoose.connect(db_url).then(()=>{
  console.log("MongoDB connected.")
 }
